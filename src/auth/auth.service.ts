@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
+import { UserModel } from 'src/user/model/user.model';
 
 @Injectable()
 export class AuthService {
@@ -8,5 +9,8 @@ export class AuthService {
       @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>
    ) {}
 
-   async register(dto: any) {}
+   async register(dto: any) {
+      const newUser = new this.UserModel(dto);
+      return newUser.save();
+   }
 }
