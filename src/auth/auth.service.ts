@@ -8,15 +8,22 @@ import { ModelType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
 import { UserModel } from 'src/user/model/user.model';
 import { genSalt, hash, compare } from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
    constructor(
-      @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>
+      @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>,
+      private readonly jwtService: JwtService
    ) {}
 
    async login(dto: any) {
-      return this.validateUser(dto);
+      const user = await this.validateUser(dto); // сначала валидируем
+      const tokens = await this.issueTokenPair(String(user._id)); // потом цепляем токен с конкретному id юзера
+      return {
+         user: this.returnUserFields(user),
+         ...tokens,
+      };
    }
 
    async register(dto: AuthDto) {
@@ -32,7 +39,12 @@ export class AuthService {
          email: dto.email,
          password: await hash(dto.password, salt),
       }); // и создаем нового в бд
-      return newUser.save();
+
+      const tokens = await this.issueTokenPair(String(newUser._id));
+      return {
+         user: this.returnUserFields(newUser),
+         ...tokens,
+      };
    }
 
    async validateUser(dto: AuthDto): Promise<UserModel> {
@@ -46,5 +58,29 @@ export class AuthService {
          throw new UnauthorizedException('Invalid password!');
       }
       return user;
+   }
+
+   // функция для создания времени пары токенов  - самого токена и его обновления
+   async issueTokenPair(userId: string) {
+      const data = { _id: userId };
+
+      const refreshToken = await this.jwtService.signAsync(data, {
+         expiresIn: '15d', // обновлять токен надо через каждые 15 дней
+      });
+
+      const accessToken = await this.jwtService.signAsync(data, {
+         expiresIn: '1h', // а вот токен доступа чем чаще - тем лучше)
+      });
+
+      return { refreshToken, accessToken };
+   }
+
+   returnUserFields(user: UserModel) {
+      // функция с полями юзера
+      return {
+         _id: user._id,
+         email: user.email,
+         isAdmin: user.isAdmin,
+      };
    }
 }
