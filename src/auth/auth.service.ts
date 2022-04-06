@@ -1,3 +1,4 @@
+import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { AuthDto } from './dto/auth.dto';
 import {
    BadRequestException,
@@ -17,9 +18,27 @@ export class AuthService {
       private readonly jwtService: JwtService
    ) {}
 
-   async login(dto: any) {
+   async login(dto: AuthDto) {
       const user = await this.validateUser(dto); // сначала валидируем
       const tokens = await this.issueTokenPair(String(user._id)); // потом цепляем токен с конкретному id юзера
+      return {
+         user: this.returnUserFields(user),
+         ...tokens,
+      };
+   }
+
+   async getNewTokens({ refreshToken }: RefreshTokenDto) {
+      // логика для обновления токена
+      if (!refreshToken) {
+         throw new UnauthorizedException('Please, sign in!');
+      }
+      const result = await this.jwtService.verifyAsync(refreshToken); // проверка наш или не наш токен
+      if (!result) {
+         throw new UnauthorizedException('Invalid token or expired!');
+      }
+      const user = await this.UserModel.findById(result._id);
+
+      const tokens = this.issueTokenPair(String(user._id));
       return {
          user: this.returnUserFields(user),
          ...tokens,
