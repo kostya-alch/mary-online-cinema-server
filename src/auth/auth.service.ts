@@ -18,9 +18,11 @@ export class AuthService {
       private readonly jwtService: JwtService
    ) {}
 
-   async login(dto: AuthDto) {
-      const user = await this.validateUser(dto); // сначала валидируем
-      const tokens = await this.issueTokenPair(String(user._id)); // потом цепляем токен с конкретному id юзера
+   async login({ email, password }: AuthDto) {
+      const user = await this.validateUser(email, password);
+
+      const tokens = await this.issueTokenPair(String(user._id));
+
       return {
          user: this.returnUserFields(user),
          ...tokens,
@@ -38,7 +40,7 @@ export class AuthService {
       }
       const user = await this.UserModel.findById(result._id);
 
-      const tokens = this.issueTokenPair(String(user._id));
+      const tokens = await this.issueTokenPair(String(user._id));
       return {
          user: this.returnUserFields(user),
          ...tokens,
@@ -47,6 +49,7 @@ export class AuthService {
 
    async register(dto: AuthDto) {
       const oldUser = await this.UserModel.findOne({ email: dto.email }); // ищем конкретного юзера
+
       if (oldUser) {
          // если не нашли - бросаем ошибку
          throw new BadRequestException(
@@ -54,28 +57,32 @@ export class AuthService {
          );
       }
       const salt = await genSalt(10); // генерируем соль для хэша пароля
+
       const newUser = new this.UserModel({
          email: dto.email,
          password: await hash(dto.password, salt),
       }); // и создаем нового в бд
 
-      const tokens = await this.issueTokenPair(String(newUser._id));
+      const user = await newUser.save();
+      const tokens = await this.issueTokenPair(String(user._id));
+
       return {
-         user: this.returnUserFields(newUser),
+         user: this.returnUserFields(user),
          ...tokens,
       };
    }
 
-   async validateUser(dto: AuthDto): Promise<UserModel> {
-      // функция валидации юзера
-      const user = await this.UserModel.findOne({ email: dto.email });
-      if (!user) {
-         throw new UnauthorizedException('User not found!');
-      }
-      const isValidPassword = await compare(dto.password, user.password); // compare сверяет пароли
-      if (!isValidPassword) {
-         throw new UnauthorizedException('Invalid password!');
-      }
+   async findByEmail(email: string) {
+      return this.UserModel.findOne({ email }).exec();
+   }
+
+   async validateUser(email: string, password: string): Promise<UserModel> {
+      const user = await this.findByEmail(email);
+      if (!user) throw new UnauthorizedException('User not found');
+
+      const isValidPassword = await compare(password, user.password);
+      if (!isValidPassword) throw new UnauthorizedException('Invalid password');
+
       return user;
    }
 

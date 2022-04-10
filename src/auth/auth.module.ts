@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
+   controllers: [AuthController],
    imports: [
       TypegooseModule.forFeature([
          {
@@ -26,6 +27,5 @@ import { JwtModule } from '@nestjs/jwt';
       }),
    ],
    providers: [AuthService, jwtStrategy],
-   controllers: [AuthController],
 })
 export class AuthModule {}

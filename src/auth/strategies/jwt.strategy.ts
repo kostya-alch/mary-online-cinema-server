@@ -23,6 +23,7 @@ export class jwtStrategy extends PassportStrategy(Strategy) {
 
    // вынес в отдельную функцию валидацию jwt токена
    async validate({ _id }: Pick<UserModel, '_id'>) {
-      return this.UserModel.findById(_id).exec();
+      const user = await this.UserModel.findById(_id);
+      return user;
    }
 }
