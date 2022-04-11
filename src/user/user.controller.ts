@@ -21,7 +21,7 @@ export class UserController {
    constructor(private readonly userService: UserService) {}
 
    @Get('profile')
-   @Auth('admin')
+   @Auth()
    async getProfile(@User('_id') _id: string) {
       return this.userService.byId(_id);
    }
@@ -34,21 +34,21 @@ export class UserController {
       return this.userService.updateProfile(_id, dto);
    }
 
+   @Get('count')
+   @Auth('admin')
+   async getCountUsers() {
+      return this.userService.getCount();
+   }
+
    @UsePipes(new ValidationPipe())
    @Put(':id')
    @HttpCode(200)
    @Auth('admin')
    async updateUser(
-      @Param('_id', IdValidationPipe) _id: string,
+      @Param('id', IdValidationPipe) id: string,
       @Body() dto: UpdateUserDto
    ) {
-      return this.userService.updateProfile(_id, dto);
-   }
-
-   @Get('count')
-   @Auth('admin')
-   async getCountUsers() {
-      return this.userService.getCount();
+      return this.userService.updateProfile(id, dto);
    }
 
    @Get()
