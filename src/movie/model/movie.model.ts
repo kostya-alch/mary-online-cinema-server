@@ -6,7 +6,7 @@ import { ActorModel } from 'src/actor/model/actor.model';
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface MovieModel extends Base {}
 
-export class Parameters {
+export class Parameter {
    @prop()
    year: number;
 
@@ -14,7 +14,7 @@ export class Parameters {
    duration: number;
 
    @prop()
-   country: number;
+   country: string;
 }
 
 export class MovieModel extends TimeStamps {
@@ -24,29 +24,29 @@ export class MovieModel extends TimeStamps {
    @prop()
    bigPoster: string;
 
-   @prop()
+   @prop({ unique: true })
    title: string;
 
-   @prop({ unique: true })
-   slug: string;
+   @prop()
+   parameters: Parameter;
 
    @prop({ default: 4.0 })
    rating?: number;
 
-   @prop({ default: 0 })
-   countOpened?: number;
-
-   @prop()
-   videoUrl: string;
-
-   @prop()
-   parameters?: Parameters;
-
    @prop({ ref: () => GenreModel })
    genres: Ref<GenreModel>[];
 
+   @prop({ default: 0 })
+   countOpened?: number;
+
+   @prop({ unique: true })
+   videoUrl: string;
+
    @prop({ ref: () => ActorModel })
    actors: Ref<ActorModel>[];
+
+   @prop({ unique: true })
+   slug: string;
 
    @prop({ default: false })
    isSendTelegram?: boolean;

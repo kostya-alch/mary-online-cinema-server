@@ -14,7 +14,7 @@ export class Parameters {
    duration: number;
 
    @IsString()
-   country: number;
+   country: string;
 }
 
 export class CreateMovieDto {
@@ -28,10 +28,7 @@ export class CreateMovieDto {
    title: string;
 
    @IsString()
-   slug: string;
-
-   @IsString()
-   videoUrl: string;
+   description: string;
 
    @IsObject()
    parameters?: Parameters;
@@ -43,6 +40,12 @@ export class CreateMovieDto {
    @IsArray()
    @IsString({ each: true })
    actors: string[];
+
+   @IsString()
+   videoUrl: string;
+
+   @IsString()
+   slug: string;
 
    @IsBoolean()
    isSendTelegram?: boolean;

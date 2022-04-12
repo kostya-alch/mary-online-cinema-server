@@ -80,6 +80,7 @@ export class MovieService {
          };
       }
       return this.MovieModel.find(options)
+         .find(options)
          .select('-updatedAt -__v')
          .sort({
             createdAt: 'desc',
@@ -99,6 +100,7 @@ export class MovieService {
          bigPoster: '',
          actors: [],
          genres: [],
+         description: '',
          poster: '',
          title: '',
          videoUrl: '',
