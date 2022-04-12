@@ -1,4 +1,4 @@
-import { MovieModel } from './../../dist/movie/model/movie.model.d';
+import { MovieModel } from './model/movie.model';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { Module } from '@nestjs/common';
 import { MovieController } from './movie.controller';

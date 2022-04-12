@@ -1,6 +1,6 @@
 import { CreateMovieDto } from './dto/createMovie.dto';
 import { ModelType } from '@typegoose/typegoose/lib/types';
-import { MovieModel } from './../../dist/movie/model/movie.model.d';
+import { MovieModel } from './model/movie.model';
 import { InjectModel } from 'nestjs-typegoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
@@ -22,7 +22,7 @@ export class MovieService {
    }
 
    // ищем фильм по актеру
-   async byActor(actorId: string) {
+   async byActor(actorId: Types.ObjectId) {
       const doc = await this.MovieModel.find({ actors: actorId }).exec();
       if (!doc) throw new NotFoundException('Movies not found!');
       return doc;
@@ -33,7 +33,7 @@ export class MovieService {
       const doc = await this.MovieModel.find({
          genres: { $in: genreIds },
       }).exec();
-      if (!doc) throw new NotFoundException('Actor not found!');
+      if (!doc) throw new NotFoundException('Movies not found!');
       return doc;
    }
 
@@ -54,7 +54,7 @@ export class MovieService {
          }
       ).exec();
 
-      if (!updateDoc) throw new NotFoundException('Genre not found!!');
+      if (!updateDoc) throw new NotFoundException('Movies not found!!');
 
       return updateDoc;
    }
@@ -62,7 +62,7 @@ export class MovieService {
    // ищем фильм по его id
    async byId(_id: string) {
       const movie = await this.MovieModel.findById(_id);
-      if (!movie) throw new NotFoundException('Movie not found');
+      if (!movie) throw new NotFoundException('Movies not found');
       return movie;
    }
 

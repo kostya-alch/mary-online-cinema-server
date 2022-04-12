@@ -1,4 +1,4 @@
-import { GenreModel } from './../../genre/model/genre.model';
+import { GenreModel } from '../../genre/model/genre.model';
 import { prop, Ref } from '@typegoose/typegoose';
 import { TimeStamps, Base } from '@typegoose/typegoose/lib/defaultClasses';
 import { ActorModel } from 'src/actor/model/actor.model';
