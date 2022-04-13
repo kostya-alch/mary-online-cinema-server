@@ -1,9 +1,10 @@
 import { UpdateUserDto } from './dto/UpdateUserDto';
 import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
-import { UserModel } from 'src/user/model/user.model';
+import { UserModel } from './model/user.model';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { genSalt, hash } from 'bcryptjs';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UserService {
@@ -66,5 +67,22 @@ export class UserService {
 
    async delete(id: string): Promise<DocumentType<UserModel> | null> {
       return this.UserModel.findByIdAndDelete(id).exec();
+   }
+
+   async toggleFavourites(movieId: Types.ObjectId, user: UserModel) {
+      const { _id, favourites } = user;
+
+      await this.UserModel.findByIdAndUpdate(_id, {
+         favorites: favourites.includes(movieId)
+            ? favourites.filter((id) => String(id) !== String(movieId))
+            : [...favourites, movieId],
+      });
+   }
+
+   async getFavouriteMovies(_id: Types.ObjectId) {
+      return this.UserModel.findById(_id, 'favourites')
+         .populate({ path: 'favourites', populate: { path: 'genres' } })
+         .exec()
+         .then((data) => data.favourites);
    }
 }
