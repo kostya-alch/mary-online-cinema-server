@@ -1,4 +1,4 @@
-import { ConfigModule } from '@nestjs/config';
+import { MovieModule } from 'src/movie/movie.module';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { Module } from '@nestjs/common';
 import { GenreController } from './genre.controller';
@@ -15,7 +15,7 @@ import { GenreModel } from './model/genre.model';
             },
          },
       ]),
-      ConfigModule,
+      MovieModule,
    ],
    controllers: [GenreController],
    providers: [GenreService],

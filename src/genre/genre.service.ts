@@ -1,3 +1,5 @@
+import { ICollection } from './interface/genre.interface';
+import { MovieService } from './../movie/movie.service';
 import { CreateGenreDto } from './dto/createGenreDto';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
@@ -8,7 +10,8 @@ import { GenreModel } from './model/genre.model';
 export class GenreService {
    constructor(
       @InjectModel(GenreModel)
-      private readonly GenreModel: ModelType<GenreModel>
+      private readonly GenreModel: ModelType<GenreModel>,
+      private readonly movieService: MovieService
    ) {}
 
    async bySlug(slug: string) {
@@ -66,11 +69,22 @@ export class GenreService {
       return genre._id;
    }
 
-   // коллекции для вкладки каталог. пока что функция-заглушка
+   // коллекции для вкладки каталога
    async getCollection() {
       const genres = await this.getAll();
-      const collections = genres;
-      return collections;
+      const collection = await Promise.all(
+         genres.map(async (genre) => {
+            const movieByGenre = await this.movieService.byGenres([genre._id]);
+            const result: ICollection = {
+               _id: String(genre._id),
+               image: movieByGenre[0].bigPoster,
+               slug: genre.slug,
+               title: genre.name,
+            };
+            return result;
+         })
+      );
+      return collection;
    }
 
    // функция обновления жанра фильма
