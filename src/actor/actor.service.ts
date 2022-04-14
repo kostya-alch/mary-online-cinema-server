@@ -29,6 +29,7 @@ export class ActorService {
 
       if (searchTerm) {
          options = {
+            // можем искать либо по имени, либо по slug
             $or: [
                {
                   name: new RegExp(searchTerm, 'i'),
@@ -81,13 +82,13 @@ export class ActorService {
          new: true,
       }).exec();
 
-      if (!updateDoc) throw new NotFoundException('Genre not found!!');
+      if (!updateDoc) throw new NotFoundException('Actor not found!!');
       return updateDoc;
    }
 
    async delete(id: string) {
       const deleteDoc = await this.ActorModel.findByIdAndDelete(id).exec();
-      if (!deleteDoc) throw new NotFoundException('Genre not found!!');
+      if (!deleteDoc) throw new NotFoundException('Actor not found!!');
       return deleteDoc;
    }
 }

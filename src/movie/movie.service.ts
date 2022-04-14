@@ -128,4 +128,16 @@ export class MovieService {
       if (!deleteDoc) throw new NotFoundException('Movies not found!!');
       return deleteDoc;
    }
+
+   async updateRating(id: Types.ObjectId, newRating: number) {
+      return this.MovieModel.findOneAndUpdate(
+         id,
+         {
+            rating: newRating,
+         },
+         {
+            new: true,
+         }
+      );
+   }
 }
