@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Types } from 'mongoose';
 
+// валидация айдишника
 export class IdValidationPipe implements PipeTransform {
    transform(value: string, meta: ArgumentMetadata) {
       if (meta.type !== 'param') return value;

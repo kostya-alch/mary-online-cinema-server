@@ -40,7 +40,7 @@ export class ActorService {
             ],
          };
       }
-
+      // делаем выборку по данным
       return this.ActorModel.aggregate()
          .match(options)
          .lookup({

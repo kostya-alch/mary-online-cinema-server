@@ -21,3 +21,4 @@ export class OnlyAdminGuard implements CanActivate {
       return user.isAdmin;
    }
 }
+// взято из документации

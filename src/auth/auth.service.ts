@@ -18,6 +18,7 @@ export class AuthService {
       private readonly jwtService: JwtService
    ) {}
 
+   // метод логина
    async login({ email, password }: AuthDto) {
       const user = await this.validateUser(email, password);
 
@@ -76,6 +77,7 @@ export class AuthService {
       return this.UserModel.findOne({ email }).exec();
    }
 
+   // валидация юзера
    async validateUser(email: string, password: string): Promise<UserModel> {
       const user = await this.findByEmail(email);
       if (!user) throw new UnauthorizedException('User not found');
