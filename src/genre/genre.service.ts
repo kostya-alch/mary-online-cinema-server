@@ -75,6 +75,8 @@ export class GenreService {
       const collection = await Promise.all(
          genres.map(async (genre) => {
             const movieByGenre = await this.movieService.byGenres([genre._id]);
+            if (movieByGenre.length === 0) return null;
+
             const result: ICollection = {
                _id: String(genre._id),
                image: movieByGenre[0].bigPoster,
@@ -84,7 +86,7 @@ export class GenreService {
             return result;
          })
       );
-      return collection;
+      return collection.filter((el) => el !== null);
    }
 
    // функция обновления жанра фильма
